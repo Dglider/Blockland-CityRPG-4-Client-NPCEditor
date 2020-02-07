@@ -1,0 +1,660 @@
+/////////////////////
+//NPC Color Set GUI//
+/////////////////////
+
+//I am not touching this nightmare
+//I did not write it.  All I did was change some names to make it not conflict with the default colorset editor, and to make it modify the right preferences.
+//It was pulled from some decompiled garbage and fixed up to work for this project.
+//Good luck if something goes wrong ¯\_(o_o)_/¯
+
+function NPCColorSetGui::onWake(%this)
+{
+   if (!%this.initialized)
+   {
+      %this.initialized = 1;
+      %this.load();
+   }
+   %this.Display();
+   if (NPCcolorSetGui_option0.getValue() == 0.0 && NPCcolorSetGui_option1.getValue() == 0.0)
+   {
+      NPCcolorSetGui_option0.setValue(1);
+   }
+   NPCColorSetGui.selectColor(0);
+}
+
+function NPCColorSetGui::onSleep(%this)
+{
+}
+
+function NPCColorSetGui::save(%this)
+{
+   export("$NPCAvatar::*", "config/client/npcAvatarColors.cs");
+}
+
+function NPCColorSetGui::load(%this)
+{
+   if (isFile("config/client/npcAvatarColors.cs"))
+   {
+      exec("config/client/npcAvatarColors.cs");
+   }
+   else
+   {
+      %this.defaults();
+      %this.save();
+   }
+}
+
+function NPCColorSetGui::defaults(%this)
+{
+   deleteVariables("$NPCAvatar::*");
+   %i = -1;
+   $NPCAvatar::Color[%i++] = "0.900 0.000 0.000 1.000";
+   $NPCAvatar::Color[%i++] = "0.900 0.900 0.000 1.000";
+   $NPCAvatar::Color[%i++] = "0.000 0.500 0.250 1.000";
+   $NPCAvatar::Color[%i++] = "0.200 0.000 0.800 1.000";
+   $NPCAvatar::Color[%i++] = "0.900 0.900 0.900 1.000";
+   $NPCAvatar::Color[%i++] = "0.750 0.750 0.750 1.000";
+   $NPCAvatar::Color[%i++] = "0.500 0.500 0.500 1.000";
+   $NPCAvatar::Color[%i++] = "0.200 0.200 0.200 1.000";
+   $NPCAvatar::Color[%i++] = IColorToFColor("100 50 0 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("230 87 20 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("191 46 123 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("99 0 30 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("34 69 69 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("0 36 85 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("27 117 196 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("255 255 255 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("20 20 20 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("255 255 255 64");
+   $NPCAvatar::Color[%i++] = IColorToFColor("236 131 173 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("255 154 108 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("255 224 156 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("244 224 200 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("200 235 125 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("138 178 141 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("143 237 245 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("178 169 231 255");
+   $NPCAvatar::Color[%i++] = IColorToFColor("224 143 244 255");
+   $NPCAvatar::Color[%i++] = "0.667 0.000 0.000 0.700";
+   $NPCAvatar::Color[%i++] = "1.000 0.500 0.000 0.700";
+   $NPCAvatar::Color[%i++] = "0.990 0.960 0.000 0.700";
+   $NPCAvatar::Color[%i++] = "0.000 0.471 0.196 0.700";
+   $NPCAvatar::Color[%i++] = "0.000 0.200 0.640 0.700";
+   $NPCAvatar::Color[%i++] = IColorToFColor("152 41 100 178");
+   $NPCAvatar::Color[%i++] = "0.550 0.700 1.000 0.700";
+   $NPCAvatar::Color[%i++] = "0.850 0.850 0.850 0.700";
+   $NPCAvatar::Color[%i++] = "0.100 0.100 0.100 0.700";
+   $NPCAvatar::NumColors = %i++;
+   %this.Display();
+}
+
+function NPCColorSetGui::Display(%this)
+{
+   if (isObject(NPCColorSet_Box))
+   {
+      NPCColorSet_Box.clear();
+      %newBox = NPCColorSet_Box;
+   }
+   else
+   {
+      NPCColorSet_Scroll.clear();
+      %newBox = new GuiSwatchCtrl(NPCColorSet_Box){
+      };
+      NPCColorSet_Scroll.add(%newBox);
+      %newBox.setColor("0 0 0 0");
+      %newBox.resize(0, 0, 32, 32);
+   }
+   %itemCount = 0;
+   %rowLimit = 6;
+   %i = 0;
+   while(%i < $NPCAvatar::NumColors)
+   {
+      %color = $NPCAvatar::Color[%i];
+      %newSwatch = new GuiSwatchCtrl("NPCColorSetSwatch" @ %i){
+      };
+      %newBox.add(%newSwatch);
+      %newSwatch.setColor(%color);
+      %x = (%itemCount % %rowLimit) * 32.0;
+      %y = mFloor(%itemCount / %rowLimit) * 32.0;
+      %newSwatch.resize(%x, %y, 32, 32);
+      %newButton = new GuiBitmapButtonCtrl(""){
+      };
+      %newBox.add(%newButton);
+      %newButton.setBitmap("base/client/ui/btnColor");
+      %newButton.setText(" ");
+      %newButton.resize(%x, %y, 32, 32);
+      %newButton.command = "NPCcolorSetGui.selectColor(" @ %i @ ");";
+      %itemCount = %itemCount + 1.0;
+      %i = %i + 1.0;
+   }
+   if (%itemCount >= %rowLimit)
+   {
+      %w = %rowLimit * 32.0;
+   }
+   else
+   {
+      %w = %itemCount * 32.0;
+   }
+   %h = (mFloor(%itemCount / %rowLimit) + 1.0) * 32.0;
+   %newBox.resize(0, 0, %w, %h);
+}
+
+function NPCColorSetGui::AddColor(%this, %color)
+{
+   if ($NPCAvatar::Color[NPCColorSetGui.currColor] $= "")
+   {
+      $NPCAvatar::Color[$NPCAvatar::NumColors] = "0.5 0.5 0.5 1";
+   }
+   else
+   {
+      $NPCAvatar::Color[$NPCAvatar::NumColors] = $NPCAvatar::Color[NPCColorSetGui.currColor];
+   }
+   NPCColorSetGui.currColor = $NPCAvatar::NumColors;
+   $NPCAvatar::NumColors = $NPCAvatar::NumColors + 1.0;
+   NPCColorSetGui.Display();
+}
+
+function NPCColorSetGui::deleteColor(%this)
+{
+   %idx = %this.currColor;
+   if (%idx < 0.0 || %idx >= $NPCAvatar::NumColors)
+   {
+      return;
+   }
+   if ($NPCAvatar::Color[%idx] $= "")
+   {
+      return;
+   }
+   while(%idx + 1.0 < $NPCAvatar::NumColors)
+   {
+      %i = %idx + 1.0;
+      if (%i < $NPCAvatar::NumColors)
+      {
+         $NPCAvatar::Color[%i - 1.0] = $NPCAvatar::Color[%i];
+         %i++;
+      }
+      %idx++;
+   }
+   $NPCAvatar::Color[$NPCAvatar::NumColors] = "";
+   $NPCAvatar::NumColors = $NPCAvatar::NumColors - 1.0;
+   %this.Display();
+}
+
+function NPCColorSetGui::selectColor(%this, %idx)
+{
+   %color = $NPCAvatar::Color[%idx];
+   NPCcolorSet_Result.setColor(%color);
+   %this.currColor = %idx;
+   %r = getWord(%color, 0);
+   %g = getWord(%color, 1);
+   %b = getWord(%color, 2);
+   %a = getWord(%color, 3);
+   if (NPCcolorSetGui_option0.getValue() == 1.0)
+   {
+      NPCColorSetGui_Slider0.setValue(%r);
+      NPCColorSetGui_Slider1.setValue(%g);
+      NPCColorSetGui_Slider2.setValue(%b);
+      NPCColorSetGui_Slider3.setValue(%a);
+   }
+   else
+   {
+      %hsv = RGBtoHSV(%r, %g, %b);
+      %h = getWord(%hsv, 0);
+      %s = getWord(%hsv, 1);
+      %v = getWord(%hsv, 2);
+      NPCColorSetGui_Slider0.setValue(%h);
+      NPCColorSetGui_Slider1.setValue(%s);
+      NPCColorSetGui_Slider2.setValue(%v);
+      NPCColorSetGui_Slider3.setValue(%a);
+   }
+}
+
+function NPCColorSetGui::setMode(%this, %mode)
+{
+   if (%mode == $COLORMODE_RGB)
+   {
+      NPCcolorSetGui_Label0.setText("R");
+      NPCcolorSetGui_Label1.setText("G");
+      NPCcolorSetGui_Label2.setText("B");
+      if (NPCcolorSetGui_option0.getValue() == 0.0)
+      {
+         %h = NPCColorSetGui_Slider0.getValue();
+         %s = NPCColorSetGui_Slider1.getValue();
+         %v = NPCColorSetGui_Slider2.getValue();
+         %a = NPCColorSetGui_Slider3.getValue();
+         %RGB = HSVtoRGB(%h, %s, %v);
+         %r = getWord(%RGB, 0);
+         %g = getWord(%RGB, 1);
+         %b = getWord(%RGB, 2);
+         NPCColorSetGui_Slider0.setValue(%r);
+         NPCColorSetGui_Slider1.setValue(%g);
+         NPCColorSetGui_Slider2.setValue(%b);
+         $NPCAvatar::Color[NPCColorSetGui.currColor] = %r @ %g @ %b @ %a;
+         NPCcolorSet_Result.setColor(%r @ %g @ %b @ %a);
+         %obj = "NPCColorSetSwatch" @ NPCColorSetGui.currColor;//HERE
+         %obj.setColor(%r @ %g @ %b @ %a);
+      }
+   }
+   else
+   {
+      if (%mode == $COLORMODE_HSV)
+      {
+         NPCcolorSetGui_Label0.setText("H");
+         NPCcolorSetGui_Label1.setText("S");
+         NPCcolorSetGui_Label2.setText("V");
+         if (NPCcolorSetGui_option1.getValue() == 0.0)
+         {
+            %r = NPCColorSetGui_Slider0.getValue();
+            %g = NPCColorSetGui_Slider1.getValue();
+            %b = NPCColorSetGui_Slider2.getValue();
+            %a = NPCColorSetGui_Slider3.getValue();
+            %hsv = RGBtoHSV(%r, %g, %b);
+            NPCColorSetGui_Slider0.setValue(getWord(%hsv, 0));
+            NPCColorSetGui_Slider1.setValue(getWord(%hsv, 1));
+            NPCColorSetGui_Slider2.setValue(getWord(%hsv, 2));
+            $Avatar::Color[NPCColorSetGui.currColor] = %r @ %g @ %b @ %a;
+            colorSet_Result.setColor(%r @ %g @ %b @ %a);
+            %obj = "NPCColorSetSwatch" @ NPCColorSetGui.currColor;
+            %obj.setColor(%r @ %g @ %b @ %a);
+         }
+      }
+   }
+}
+
+function NPCColorSetGui::update()
+{
+   if (NPCcolorSetGui_option0.getValue())
+   {
+      %mode = $COLORMODE_RGB;
+   }
+   else
+   {
+      if (NPCcolorSetGui_option1.getValue())
+      {
+         %mode = $COLORMODE_HSV;
+      }
+      else
+      {
+         %mode = $COLORMODE_RGB;
+      }
+   }
+   if (%mode == $COLORMODE_RGB)
+   {
+      %r = NPCColorSetGui_Slider0.getValue();
+      %g = NPCColorSetGui_Slider1.getValue();
+      %b = NPCColorSetGui_Slider2.getValue();
+   }
+   else
+   {
+      if (%mode == $COLORMODE_HSV)
+      {
+         %h = NPCColorSetGui_Slider0.getValue();
+         %s = NPCColorSetGui_Slider1.getValue();
+         %v = NPCColorSetGui_Slider2.getValue();
+         %RGB = HSVtoRGB(%h, %s, %v);
+         %r = getWord(%RGB, 0);
+         %g = getWord(%RGB, 1);
+         %b = getWord(%RGB, 2);
+      }
+   }
+   %a = NPCColorSetGui_Slider3.getValue();
+   $NPCAvatar::Color[NPCColorSetGui.currColor] = %r SPC %g SPC %b SPC %a;
+   NPCcolorSet_Result.setColor($NPCAvatar::Color[NPCColorSetGui.currColor]);
+   %obj = "NPCColorSetSwatch" @ NPCColorSetGui.currColor;
+   %obj.setColor($NPCAvatar::Color[NPCColorSetGui.currColor]);
+}
+if(isObject(NPCColorSetGui))
+   NPCColorSetGui.delete();
+//--- OBJECT WRITE BEGIN ---
+new GuiControl("NPCColorSetGui")
+{
+   profile = "GuiDefaultProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 2";
+   enabled = "1";
+   visible = "1";
+   clipToParent = "1";
+   variable = "";
+   command = "";
+   altCommand = "";
+   accelerator = "";
+
+   new GuiWindowCtrl() {
+      profile = "BlockWindowProfile";
+      horizSizing = "center";
+      vertSizing = "center";
+      position = "28 96";
+      extent = "583 287";
+      minExtent = "583 287";
+      enabled = "1";
+      visible = "1";
+      clipToParent = "1";
+      text = "Color Set";
+      maxLength = "255";
+      resizeWidth = "0";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      closeCommand = "canvas.popDialog(NPCcolorSetGui);";
+
+      new GuiSwatchCtrl() {
+         profile = "GuiDefaultProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "224 39";
+         extent = "95 95";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         color = "0 0 0 255";
+      };
+      new GuiScrollCtrl(NPCColorSet_Scroll) {
+         profile = "ColorScrollProfile";
+         horizSizing = "right";
+         vertSizing = "height";
+         position = "13 39";
+         extent = "204 192";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         willFirstRespond = "1";
+         hScrollBar = "alwaysOff";
+         vScrollBar = "alwaysOn";
+         constantThumbHeight = "0";
+         childMargin = "0 0";
+         rowHeight = "40";
+         columnWidth = "30";
+      };
+      new GuiSwatchCtrl(NPCcolorSet_Result) {
+         profile = "GuiDefaultProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "226 41";
+         extent = "91 91";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         color = "221 0 0 255";
+      };
+      new GuiBitmapButtonCtrl() {
+         profile = "BlockButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "143 221";
+         extent = "60 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCcolorSetGui.addColor();";
+         text = "Add";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         bitmap = "base/client/ui/button2";
+         lockAspectRatio = "0";
+         alignLeft = "0";
+         alignTop = "0";
+         overflowImage = "0";
+         mKeepCached = "0";
+         mColor = "255 255 255 255";
+      };
+      new GuiBitmapButtonCtrl() {
+         profile = "BlockButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "471 237";
+         extent = "91 38";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCcolorSetGui.save();canvas.popDialog(NPCcolorSetGui);";
+         text = "Save >>";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         bitmap = "base/client/ui/button2";
+         lockAspectRatio = "0";
+         alignLeft = "0";
+         alignTop = "0";
+         overflowImage = "0";
+         mKeepCached = "0";
+         mColor = "255 255 255 255";
+      };
+      new GuiBitmapButtonCtrl() {
+         profile = "BlockButtonProfile";
+         horizSizing = "right";
+         vertSizing = "top";
+         position = "18 237";
+         extent = "91 38";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCcolorSetGui.load();canvas.popDialog(NPCcolorSetGui);";
+         accelerator = "escape";
+         text = "<< Cancel";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         bitmap = "base/client/ui/button2";
+         lockAspectRatio = "0";
+         alignLeft = "0";
+         alignTop = "0";
+         overflowImage = "0";
+         mKeepCached = "0";
+         mColor = "255 255 255 255";
+      };
+      new GuiBitmapButtonCtrl() {
+         profile = "BlockButtonProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "226 141";
+         extent = "91 38";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCcolorSetGui.deleteColor();";
+         text = "Delete";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         bitmap = "base/client/ui/button2";
+         lockAspectRatio = "0";
+         alignLeft = "0";
+         alignTop = "0";
+         overflowImage = "0";
+         mKeepCached = "0";
+         mColor = "255 255 255 255";
+      };
+      new GuiSliderCtrl(NPCColorSetGui_Slider3) {
+         profile = "GuiSliderProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "339 161";
+         extent = "224 31";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         altCommand = "NPCColorSetGui::update();";
+         range = "0.200000 1.000000";
+         ticks = "10";
+         value = "1";
+         snap = "0";
+      };
+      new GuiSliderCtrl(NPCColorSetGui_Slider2) {
+         profile = "GuiSliderProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "339 131";
+         extent = "224 31";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         altCommand = "NPCColorSetGui::update();";
+         range = "0.000000 1.000000";
+         ticks = "10";
+         value = "0";
+         snap = "0";
+      };
+      new GuiSliderCtrl(NPCColorSetGui_Slider1) {
+         profile = "GuiSliderProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "339 101";
+         extent = "224 31";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         altCommand = "NPCColorSetGui::update();";
+         range = "0.000000 1.000000";
+         ticks = "10";
+         value = "0";
+         snap = "0";
+      };
+      new GuiSliderCtrl(NPCColorSetGui_Slider0) {
+         profile = "GuiSliderProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "339 71";
+         extent = "224 31";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         altCommand = "NPCColorSetGui::update();";
+         range = "0.000000 1.000000";
+         ticks = "10";
+         value = "0.867";
+         snap = "0";
+      };
+      new GuiRadioCtrl(NPCcolorSetGui_option0) {
+         profile = "GuiRadioProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "372 42";
+         extent = "60 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCColorSetGui.setMode(0);";
+         text = "RGB";
+         groupNum = "1";
+         buttonType = "RadioButton";
+      };
+      new GuiRadioCtrl(NPCcolorSetGui_option1) {
+         profile = "GuiRadioProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "422 42";
+         extent = "60 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCColorSetGui.setMode(1);";
+         text = "HSV";
+         groupNum = "1";
+         buttonType = "RadioButton";
+      };
+      new GuiTextCtrl() {
+         profile = "GuiTextProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "328 42";
+         extent = "29 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         text = "Mode:";
+         maxLength = "255";
+      };
+      new GuiTextCtrl(NPCcolorSetGui_Label0) {
+         profile = "GuiTextProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "328 72";
+         extent = "8 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         text = "R";
+         maxLength = "255";
+      };
+      new GuiTextCtrl(NPCcolorSetGui_Label1) {
+         profile = "GuiTextProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "328 102";
+         extent = "8 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         text = "G";
+         maxLength = "255";
+      };
+      new GuiTextCtrl(NPCcolorSetGui_Label2) {
+         profile = "GuiTextProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "328 132";
+         extent = "8 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         text = "B";
+         maxLength = "255";
+      };
+      new GuiTextCtrl(NPCColorSetGui_Label3) {
+         profile = "GuiTextProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "328 162";
+         extent = "8 18";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         text = "A";
+         maxLength = "255";
+      };
+      new GuiBitmapButtonCtrl() {
+         profile = "BlockButtonProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "226 191";
+         extent = "91 38";
+         minExtent = "8 2";
+         enabled = "1";
+         visible = "1";
+         clipToParent = "1";
+         command = "NPCcolorSetGui.defaults();";
+         text = "Defaults";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         bitmap = "base/client/ui/button2";
+         lockAspectRatio = "0";
+         alignLeft = "0";
+         alignTop = "0";
+         overflowImage = "0";
+         mKeepCached = "0";
+         mColor = "255 255 255 255";
+      };
+   };
+};
+//--- OBJECT WRITE END ---

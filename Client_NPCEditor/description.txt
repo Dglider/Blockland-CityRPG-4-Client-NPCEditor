@@ -1,0 +1,4 @@
+Title:  NPC Editor GUI
+Author: Dglider
+A GUI for editing NPC Data in CityRPG4.
+Based off of the Avatar Editor GUI.
