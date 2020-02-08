@@ -1718,7 +1718,7 @@ function clientcmdreceiveNPCData(%brick,%category,%parameters)//Receive various 
          NPCEditorGui.addMessage("\c1Received data for \""@NPCData_Name.getValue()@"\" ("@%brick@")");
          NPCData_ID.setText("<font:Impact:18><just:center>"@%brick);
          NPCData_Section.receivingData = false;
-         if(%parameters>3)//This is hacky but- Refresh requests only 3 fields, don't redo the camera work. >.<
+         if(%parameters>3 && $Pref::NPCAvatar::UseCamera)//This is hacky but- Refresh requests only 3 fields, don't redo the camera work. >.<
          {
             commandToServer('RequestOrbitNPCSpawn',%brick);
             NPCBrick_Camera.currentOrbit = %brick;

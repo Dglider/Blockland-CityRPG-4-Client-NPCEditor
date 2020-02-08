@@ -96,6 +96,7 @@ function initNPCEditorGui()
 	   $pref::NPCAvatar::SecondPackColor = "0 1 0 1";
 	   $pref::NPCAvatar::Symmetry = "";
 	   $pref::NPCAvatar::TorsoColor = "0.900 0.900 0.000 1.000";
+	   $Pref::NPCAvatar::UseCamera = "1";
 	}
 
 	//Execute functionality

@@ -297,6 +297,21 @@ new GuiControl(NPCEditorGui) {
                mColor = "0 0 0 0";
             };
          };
+         new GuiCheckBoxCtrl() {
+            profile = "GuiCheckBoxProfile";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            position = "126 350";
+            extent = "12 11";
+            minExtent = "8 2";
+            enabled = "1";
+            visible = "1";
+            clipToParent = "1";
+            variable = "$Pref::NPCAvatar::UseCamera";
+            text = "";
+            groupNum = "-1";
+            buttonType = "ToggleButton";
+         };
       };
 
       new GuiBackgroundCtrl(NPCAvatar_Section) {
