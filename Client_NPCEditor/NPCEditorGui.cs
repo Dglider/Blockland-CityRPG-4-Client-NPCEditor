@@ -1951,6 +1951,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       visible = "1";
       clipToParent = "1";
       maxLength = "2";
+      validate = "NPCData_Pose_Frame.validateHours("@%this.numPoses-1@");";
       historySize = "0";
       password = "0";
       tabComplete = "0";
@@ -1971,6 +1972,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       visible = "1";
       clipToParent = "1";
       maxLength = "2";
+      validate = "NPCData_Pose_Frame.validateMinutes("@%this.numPoses-1@");";
       historySize = "0";
       password = "0";
       tabComplete = "0";
@@ -1991,6 +1993,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       visible = "1";
       clipToParent = "1";
       maxLength = "255";
+      validate = "NPCData_Pose_Frame.validatePosition("@%this.numPoses-1@");";
       historySize = "0";
       password = "0";
       tabComplete = "1";
@@ -2027,6 +2030,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       visible = "1";
       clipToParent = "1";
       maxLength = "255";
+      validate = "NPCData_Pose_Frame.validateRotation("@%this.numPoses-1@");";
       historySize = "0";
       password = "0";
       tabComplete = "1";
@@ -2142,5 +2146,71 @@ function NPCData_Section::requestPlayerPosRot(%this,%type,%num)//Request player 
          NPCEditorGui.addMessage("\c1Requesting rotation...");
          commandToServer('requestNPCPlayerRot',%this.currentNPC,%num);
       }
+   }
+}
+function NPCData_Pose_Frame::validateHours(%this,%rowNum)
+{
+   if(isObject(%box = nameToID("NPCData_Pose_"@%rowNum@"_Time_H")))
+   {
+      %value = %box.getValue();
+      %value = %value % 24;
+      while(strLen(%value)<2)
+      {
+         %value = "0"@%value;
+      }
+      %box.setValue(%value);
+   }
+}
+function NPCData_Pose_Frame::validateMinutes(%this,%rowNum)
+{
+   if(isObject(%box = nameToID("NPCData_Pose_"@%rowNum@"_Time_M")))
+   {
+      %value = %box.getValue();
+      %value = %value % 60;
+      while(strLen(%value)<2)
+      {
+         %value = "0"@%value;
+      }
+      %box.setValue(%value);
+   }
+}
+function NPCData_Pose_Frame::validatePosition(%this,%rowNum)
+{
+   if(isObject(%box = nameToID("NPCData_Pose_"@%rowNum@"_Position")))
+   {
+      %value = %box.getValue();
+      if(getWordCount(%value)>3)//remove extra words
+         %value = getWords(%value,0,2);
+      while(getWordCount(%value)<3)//add extra words
+      {
+         %value = %value SPC "0";
+      }
+      for(%i=0;%i<3;%i++)
+      {
+         %value = setWord(%value, %i, getWord(%value,%i)*1);//turn text into numbers
+      }
+      %box.setValue(%value);
+   }
+}
+function NPCData_Pose_Frame::validateRotation(%this,%rowNum)
+{
+   if(isObject(%box = nameToID("NPCData_Pose_"@%rowNum@"_Rotation")))
+   {
+      %value = %box.getValue();
+      if(getWordCount(%value)>4)//remove extra words
+         %value = getWords(%value,0,2);
+      while(getWordCount(%value)<3)//add extra words
+      {
+         %value = %value SPC "0";
+      }
+      %angle = getWord(%value,3);
+      if(%angle<0)
+         %neg = true;
+      %angle = mAbs(%angle);
+      %angle = %angle - mFloor(%angle/$pi)*$pi;//basically the % operation but works with floats.
+      if(%neg)
+         %angle *= -1;
+      %value = vectorNormalize(getWords(%value,0,2)) SPC %angle;//axis SPC angle
+      %box.setValue(%value);
    }
 }
