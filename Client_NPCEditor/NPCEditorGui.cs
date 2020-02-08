@@ -2004,7 +2004,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       profile = "GuiButtonProfile";
       horizSizing = "right";
       vertSizing = "bottom";
-      position = getWords(vectorAdd(%newPos.position,"63 3"),0,1);
+      position = getWords(vectorAdd(%this.position,vectorAdd(%newPos.position,"61 1")),0,1);
       extent = "12 16";
       enabled = "1";
       visible = "1";
@@ -2041,7 +2041,7 @@ function NPCData_Pose_Frame::addPoseRow(%this)//Add all of the boxes and buttons
       profile = "GuiButtonProfile";
       horizSizing = "right";
       vertSizing = "bottom";
-      position = getWords(vectorAdd(%newRot.position,"63 3"),0,1);
+      position = getWords(vectorAdd(%this.position,vectorAdd(%newRot.position,"61 1")),0,1);
       extent = "12 16";
       enabled = "1";
       visible = "1";
