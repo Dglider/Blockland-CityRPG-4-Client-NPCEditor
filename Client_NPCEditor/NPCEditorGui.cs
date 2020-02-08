@@ -2207,7 +2207,7 @@ function NPCData_Pose_Frame::validateRotation(%this,%rowNum)
       if(%angle<0)
          %neg = true;
       %angle = mAbs(%angle);
-      %angle = %angle - mFloor(%angle/$pi)*$pi;//basically the % operation but works with floats.
+      %angle = %angle - mFloor(%angle/($pi*2))*($pi*2);//basically the % operation but works with floats.
       if(%neg)
          %angle *= -1;
       %value = vectorNormalize(getWords(%value,0,2)) SPC %angle;//axis SPC angle
